@@ -17,7 +17,7 @@
 \usepackage{natbib}
 \usepackage{doi}
 
-
+\usepackage{mathtools}
 
 \title{A template for the \emph{arxiv} style}
 
@@ -83,6 +83,22 @@ pdfkeywords={First keyword, Second keyword, More},
 
 \section{Model}\label{sec:model}
 
+Imagine a data set with $i = 1, ..., N$ observations. We want to predict a binary outcome $y$ given predictors $x$. While this situation can be modeled by logistic regression (or any other classifier), our situation differs because we have information about time: All predictors are available at time $t = 1, ..., T$. The outcome will be observed later within a fixed time span (if it were already known, we would not need to predict it). 
+
+Let $y_{i(t)}$ be the outcome of individual $i$, observed within a fixed period after $t$. $x_{i(t)p}$ are the $p = 1, ..., P$ predictors that were available at the time of prediction $t$. (The subscript $t$ indicates that we make predictions at different times, not the time of observation.) $\beta$, $\alpha$ and $\nu$ are parameter matrices, each of dimension $T*P$, with entries for each predictor at all time points.
+
+Our modeling approach is described by the following equations:
+\begin{eqnarray}
+y_{i(t)} | x_{i(t)p} \sim Bin(1, \textrm{logit}^{-1}(\sum_p x_{i(t)p} \beta_{tp})) & \textrm{(observation equation)} \\
+\beta_{tp} \sim N(\alpha_{tp}, \sigma^2_{\beta})\textrm{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~} & \textrm{(fluctuation equation)} \\
+\alpha_{t+1,p} \sim N(\alpha_{t,p} + \nu_{t,p}, \sigma^2_{\alpha})\textrm{~~~~~~~~~~~~~~~~~~} & \textrm{(state equation)} \\
+\nu_{t+1,p} \sim N(\nu_{t,p}, \sigma^2_{\eta})\textrm{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~} & \textrm{(trend equation, optional)}
+\end{eqnarray}
+
+The observation equation is a logistic regression model if it were not for the subscript $t$, indicating that parameters $\beta$ are different and depend on the hour/day/year (application-specific) of prediction. There may be very few observations at each time point, impeding the estimation of $\beta$. Since state-space models (also known as dynamic linear models) \citep{prado_time_2010, shumway_time_2011, durbin_time_2012} were developed for situations, in which a single observation (or none) is available at each $t$, they appear well-suited for our analysis. The state equation and the trend equation are well-known concepts in that literature, and many extensions are available from it.
+
+Unlike other approaches we are aware of, we include a fluctuation equation (in state-space terminology this would be called observation equation), only possible because we usually have (far) more than one observation at each time point. The implication is this: If we had at each time point an infinite number of observations, $\sigma^2_\beta$ would go to $\infty$ and the $\beta_t$ would be equal to estimates of $t$ independent logistic regressions. If there are, conversely, just very few observations at each time point, $\sigma^2_\beta$ will turn out to be small and observations from neighboring time points weigh in strongly in the estimation of $\beta_t$.
+
 \section{Data}\label{sec:data}
 
 \section{Analytical Strategy}\label{sec:strategy}
@@ -110,7 +126,7 @@ Citations use \verb+natbib+. The documentation may be found at
 	\url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
 \end{center}
 
-Here is an example usage of the two main commands (\verb+citet+ and \verb+citep+): Some people thought a thing \citep{kour2014real, hadash2018estimate} but other people thought something else \citep{kour2014fast}. Many people have speculated that if we knew exactly why \citet{kour2014fast} thought this\dots
+% Here is an example usage of the two main commands (\verb+citet+ and \verb+citep+): Some people thought a thing \citep{kour2014real, hadash2018estimate} but other people thought something else \citep{kour2014fast}. Many people have speculated that if we knew exactly why \citet{kour2014fast} thought this\dots
 
 \subsection{Figures}
 \lipsum[10]
@@ -159,7 +175,7 @@ The documentation for \verb+booktabs+ (`Publication quality tables in LaTeX') is
 
 
 \bibliographystyle{unsrtnat}
-\bibliography{references}  %%% Uncomment this line and comment out the ``thebibliography'' section below to use the external .bib file (using bibtex) .
+\bibliography{references2}  %%% Uncomment this line and comment out the ``thebibliography'' section below to use the external .bib file (using bibtex) .
 
 
 %%% Uncomment this section and comment out the \bibliography{references} line above to use inline references.
