@@ -1,5 +1,5 @@
 data {
-  int<lower=0> includeTrend; // control variable to model trends (nu) or not. Set includeTrend = 0 if trends should not be modeled, any other value will allow for trends in the parameters.
+  int<lower=0> includeTrend; // Set includeTrend = 0 if trends should not be modeled, any other value will allow for trends in the parameters.
 
   int<lower=0> N; // # observations
   int<lower=0> p;   // number of predictors
