@@ -81,6 +81,19 @@ pdfkeywords={First keyword, Second keyword, More},
 
 \section{Introduction}\label{sec:introduction}
 
+Time is a crucial factor in many data sets, but best practices of how date variables should be used in analyses do not exist.
+
+For example, consider the donors-choose data set.\footnote{The KDD Cup 2014 DonorsChoose dataset is available from \href{https://www.kaggle.com/c/kdd-cup-2014-predicting-excitement-at-donors-choose/data}{Kaggle}. The \href{https://github.com/dssg/donors-choose}{Data Science for Social Good Github Repository} lays out a possible route of analysis, our reference method here.} DonorsChoose allows teachers to crowdsource funding for projects, like buying a microwave that lets them cook with children in preschool. The requested items are shipped only when enough citizen donors support the project and funding goals are met within four months. As data scientists, we want to identify postings automatically that are at risk of not meeting its funding goal, and before they get published, with the intention to help teachers improve their postings and funding chances improve. Several projects are posted each day, and it is not unlikely that factors affecting funding success change over time.
+
+A common framework to predict outcomes in settings like DonorsChoose is implemented in triage\footnote{\url{https://pypi.org/project/triage/}}, a python package. The framework is as follows: 
+\begin{itemize}
+    \item \textit{Training data}: Pool all observations from a given month (or any other user-defined interval), forming the training data. Outcomes are observed up to four months after (again, depending on the task at hand).
+    \item \textit{Model training}: Employ any statistical learning technique (e.g., random forest, boosting, linear regression ...) to generate a predictive model.
+    \item \textit{Deployment/Test data}: The predictive model gets deployed on future time periods. It is good practice to evaluate it first. For evaluation, all observations from the month after training outcomes became available (or another interval) are pooled, forming the test data.
+    \item \textit{Check sensitivity}: Repeat the steps above for different training/test months (or other time intervals), while keeping the time period between both data sets constant.
+\end{itemize}
+Statistical learning theory provides little guidance here, since a standard theoretical assumption---training and test data are drawn from the same probability distribution---is not met. Instead, the distribution $p_t(y, x)$ might shift over time and in the most extreme case, if there were a sudden shock between training and testing, extrapolation from training to the deployment period would not be possible. The contrary case, that the distribution $p_t(y, x)$ is constant in time, is the implicit working assumption in the above framework, but real data rarely behave this way. The middle ground is most realistic, namely that $p_t(y, x)$ is continuous in time. While researchers have proposed various ways to correct for distribution shift \citep[e.g.,][p. 133ff.]{varshney_trustworthy_2021}, we are not aware of any research that aims to exploit this assumption of continuity.
+
 \section{Model}\label{sec:model}
 
 Imagine a data set with $i = 1, ..., N$ observations. We want to predict a binary outcome $y$ given predictors $x$. While this situation can be modeled by logistic regression (or any other classifier), our situation differs because we have information about time: All predictors are available at time $t = 1, ..., T$. The outcome will be observed later within a fixed time span (if it were already known, we would not need to predict it). 
