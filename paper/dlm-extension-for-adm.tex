@@ -19,6 +19,8 @@
 
 \usepackage{mathtools}
 
+\graphicspath{ {./figures/} }
+
 \title{A template for the \emph{arxiv} style}
 
 %\date{September 9, 1985}	% Here you can change the date presented in the paper title
@@ -112,6 +114,33 @@ The observation equation is a logistic regression model if it were not for the s
 
 Unlike other approaches we are aware of, we include a fluctuation equation (in state-space terminology this would be called observation equation), only possible because we usually have (far) more than one observation at each time point. The implication is this: If we had at each time point an infinite number of observations, $\sigma^2_\beta$ would go to $\infty$ and the $\beta_t$ would be equal to estimates of $t$ independent logistic regressions. If there are, conversely, just very few observations at each time point, $\sigma^2_\beta$ will turn out to be small and observations from neighboring time points weigh in strongly in the estimation of $\beta_t$.
 
+\begin{figure}
+	\centering
+	\includegraphics{visualize_simulated_data.pdf}
+	\caption{Sample figure caption.}
+	\label{fig:fig1}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics{smoothed_time_series.pdf}
+	\caption{Sample figure caption.}
+	\label{fig:fig1}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics{coefficients_over_time.pdf}
+	\caption{Sample figure caption.}
+	\label{fig:fig1}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics{compare_predictions_with_simulated_data.pdf}
+	\caption{Sample figure caption.}
+	\label{fig:fig1}
+\end{figure}
 
 Warning message with data from 2011:
 
@@ -165,9 +194,9 @@ Citations use \verb+natbib+. The documentation may be found at
 % Here is an example usage of the two main commands (\verb+citet+ and \verb+citep+): Some people thought a thing \citep{kour2014real, hadash2018estimate} but other people thought something else \citep{kour2014fast}. Many people have speculated that if we knew exactly why \citet{kour2014fast} thought this\dots
 
 \subsection{Figures}
-\lipsum[10]
+
 See Figure \ref{fig:fig1}. Here is how you add footnotes. \footnote{Sample of the first footnote.}
-\lipsum[11]
+
 
 \begin{figure}
 	\centering
