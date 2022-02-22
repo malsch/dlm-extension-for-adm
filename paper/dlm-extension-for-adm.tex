@@ -21,7 +21,7 @@
 
 \graphicspath{ {./figures/} }
 
-\title{A template for the \emph{arxiv} style}
+\title{When regression parameters change over time: A proposal}
 
 %\date{September 9, 1985}	% Here you can change the date presented in the paper title
 %\date{} 					% Or removing it
@@ -30,7 +30,7 @@
 	Department of Statistics\\
 	Ludwig-Maximilians-Universität München\\
 	80539 Munich \\
-	\texttt{hippo@cs.cranberry-lemon.edu} \\
+	\texttt{hippo@cs.cranberry-lemon.edu CHANGE THIS} \\
 	%% examples of more authors
 	%% \AND
 	%% Coauthor \\
@@ -55,28 +55,28 @@
 % Uncomment to override  the `A preprint' in the header
 %\renewcommand{\headeright}{Technical Report}
 %\renewcommand{\undertitle}{Technical Report}
-\renewcommand{\shorttitle}{\textit{arXiv} Template}
+\renewcommand{\shorttitle}{Parameters that change over time}
 
 %%% Add PDF metadata to help others organize their library
 %%% Once the PDF is generated, you can check the metadata with
 %%% $ pdfinfo template.pdf
 \hypersetup{
-pdftitle={A template for the arxiv style},
-pdfsubject={q-bio.NC, q-bio.QM},
-pdfauthor={David S.~Hippocampus, Elias D.~Striatum},
-pdfkeywords={First keyword, Second keyword, More},
+pdftitle={When regression parameters change over time: A proposal},
+%pdfsubject={q-bio.NC, q-bio.QM},
+pdfauthor={Malte~Schierholz},
+pdfkeywords={Distribution shift, Forecasting individual outcomes, Regression, State space methodology}
 }
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-	\lipsum[1]
+	A common approach in forecasting problems is to estimate a least-squares regression (or other statistical learning models) from past data, which is then applied to predict future outcomes. An underlying assumption is that the same correlations that were observed in the past still hold for the future. We propose a model for situations when this assumption is not met: adopting methods from the state space literature, we model how regression parameters change over time. Our approach can shed a light on the large uncertainties associated with forecasting the future, and how much of this is due to changing dynamics of the past. Our simulation study shows that accurate estimates are obtained when the outcome is continuous, but the procedure fails for binary outcomes.
 \end{abstract}
 
 
 % keywords can be removed
-\keywords{First keyword \and Second keyword \and More}
+\keywords{Distribution shift \and Forecasting individual outcomes \and Regression \and State space methodology}
 
 
 \section{Introduction}\label{sec:introduction}
@@ -87,17 +87,17 @@ For example, consider the donorsChoose data set.\footnote{The KDD Cup 2014 Donor
 
 A common framework to predict outcomes in settings like DonorsChoose is implemented in triage\footnote{\url{https://pypi.org/project/triage/}}, a python package. The temporal cross-validation framework is as follows: 
 \begin{itemize}
-    \item \textit{Training data}: Pool all new postings from a given month, forming the training data. Include features as they were available at this time. The outcome, funding success after four months, is added, although it only becomes available with a four-month delay. In general, for applications other than DonorsChoose the interval over which observations are pooled and the delay period will of course differ.
+    \item \textit{Training data}: Pool all new postings from a given month, forming the training data. Include features as they were available at the time of the posting. The outcome, funding success after four months, is added, although it only becomes available with a four-month delay. In general, for applications other than DonorsChoose the interval over which observations are pooled and the delay period will of course differ.
     \item \textit{Model training}: Employ any statistical learning technique (e.g., random forest, boosting, linear regression, ...) to generate a predictive model. The necessary data are only available after the four-month delay.
-    \item \textit{Deployment/Test data}: The predictive model gets deployed to predict future time periods. It is good practice to evaluate it first. For evaluation, all postings are pooled from the month (or another period) when the model would get deployed, forming the test data.
+    \item \textit{Deployment/Test data}: The predictive model gets deployed to predict funding success in future time periods. It is good practice to evaluate it first. For evaluation, all postings are pooled from the month (or another period) when the model would get deployed, forming the test data.
     \item \textit{Check sensitivity}: Repeat the steps above for different training/test months (or other periods), while keeping the time period between both data sets constant. If the performance varies over time, this is a reason to worry.
 \end{itemize}
 
 Temporal cross-validation is in a sense self-contradictory. While it acknowledges that correlations found in the training data may differ in the test data, the same is not true for possible changes that may occur during the training period (or during the test period). Instead, the pooled training (or test) cases are usually analyzed as if they were collected on a single day; the time dimension within the training (or test) data gets lost.
 
-Also, what are the optimal intervals for pooling the training/test data when the dynamics shift over time? How much shift is to be expected happening after the training features were generated but before the model can get deployed? Statistical learning theory provides little guidance here, since a standard theoretical assumption---training and test data are drawn from the same probability distribution---is not met. Instead, the joint distribution of features and outcome, $p_t(y, x)$, might shift over time. In the most extreme case, if there were a sudden shock between training and testing and the dynamics change in unforeseeable ways, extrapolation from the training to the deployment period would be impossible. The contrary case, that the distribution $p_t(y, x)$ is constant in time, would allow ideal predictions, but real data rarely behave this way (as one easily sees with the sensitivity checks). The middle ground is most realistic, namely that $p_t(y, x)$ is a continuous function over time. While researchers have proposed various ways to correct for distribution shift \citep[e.g.,][p. 133ff.]{kim_universal_2022, varshney_trustworthy_2021}, we are not aware of any research that aims to model the size of such shifts, while assuming continuity.
+Besides, what is the optimal length of the interval for pooling the training/test data when the dynamics shift over time? How much shift is to be expected happening after the training features were generated but before the model can get deployed? Statistical learning theory provides little guidance here, since a standard theoretical assumption---training and test data are drawn from the same probability distribution---is not met. Instead, the joint distribution of features and outcome, $p_t(y, x)$, might shift over time. In the most extreme case, if there were a sudden shock between training and testing and the dynamics change in unforeseeable ways, extrapolation from the training to the deployment period would be impossible. The contrary case, that the distribution $p_t(y, x)$ is constant in time, would allow ideal predictions, but real data rarely behave this way (as one easily sees with the sensitivity checks). The middle ground is most realistic, namely that $p_t(y, x)$ is a continuous function over time that does change, but not too much. While researchers have proposed various ways to correct for distribution shift \citep[e.g.,][p. 133ff.]{kim_universal_2022, varshney_trustworthy_2021}, we are not aware of any research that aims to model the size of such shifts, while assuming continuity.
 
-In our approach, we do not pool training data, but model changing parameters at consecutive time points, adopting techniques from the state space literature. This is advantageous for three reasons. First, we can generate credibility intervals describing the uncertainty when predicting future outcomes. Second, our approach automatically detects possible long-term trends that would easily be missed within the standard framework mentioned above. Third, shocks that occur during the training period in the standard framework can have negative consequences for model performance (using training data from before the shock bodes ill for extrapolation into the future), but our approach would deploy parameters that were estimated at the end of the training periods, only representing the most recent dynamics after the shock ended.
+In our approach, we do not pool training data, but model changing parameters at consecutive time points, adopting techniques from the state space literature. This is advantageous for three reasons. First, we can generate credibility intervals describing the uncertainty when predicting future outcomes. Second, our approach automatically detects possible long-term trends that would easily be missed within the standard framework mentioned above. Third, shocks that occur during the training period in the standard framework can have negative consequences for model performance (using training data from before the shock bodes ill for extrapolation into the future). Our approach does not average over observations from before and after the shock, but adapts automatically to such changing realities, only perpetuating the most recent dynamics from after the shock.
 
 This paper proceeds as follows. Section 2 describes our approach. Sections 3 and 4 showcase simulation studies, illustrating the models behavior. Section 5 concludes.
 
@@ -117,17 +117,17 @@ y_{i(t)} | x_{i(t)p} \sim N(\sum_p x_{i(t)p} \beta_{tp}, \sigma_y^2) \textrm{~~~
 
 Without prior knowledge, we use non-informative priors for the variances $\sigma_y^2$, $\sigma^2_{\beta}$, $\sigma^2_{\alpha}, \sigma^2_{\eta}$ and for the vectors $\alpha_{1,p}$ and $\nu_{1,p}$ at $t=1$.
 
-The observation equation would be a least-squares regression if it were not for the subscript $t$, indicating that parameters $\beta$ vary and depend on the hour/day/year (application-specific) of prediction. There may be very few observations at each time point, impeding the estimation of $\beta$. Since state-space models (also known as dynamic linear models) \citep{prado_time_2010, shumway_time_2011, durbin_time_2012} were developed for situations, in which a single observation (or none) is available at each $t$, they appear well-suited for our analysis. The state equation and the trend equation are well-known concepts in that literature, and many extensions, for example to include seasonal patterns in the model, are available from it.
+The observation equation would be a least-squares regression if it were not for the subscript $t$, indicating that parameters $\beta$ vary and depend on the hour/day/year (application-specific) of prediction. There may be very few observations at each time point, impeding the estimation of $\beta$. Since state-space models (also known as dynamic linear models) \citep{prado_time_2010, shumway_time_2011, durbin_time_2012} were developed for situations, in which a single observation (or none) is available at each $t$, they appear well-suited for our analysis. The state equation and the trend equation are well-known concepts in that literature, and many extensions, for example to include seasonal patterns in the model, are available.
 
-Equations (2)-(4) denote independent draws from univariate Gaussians for each of the $P$ predictors. Generalizations using multivariate Gaussians with prior correlations $\neq 0$ between coefficients should be possible as well, but have not been implemented yet.
+Equations (2)-(4) denote independent draws from univariate Gaussians for each of the $P$ predictors. Generalizations using multivariate Gaussians, which would allow for prior correlations $\neq 0$ between coefficients, should be possible as well, but have not been implemented yet.
 
-Unlike other approaches we are aware of, we include a fluctuation equation (in state-space terminology this would be called the observation equation), only possible because we usually have (far) more than one observation at each time point. The implication is this: If we had at each time point an infinite number of observations, $\sigma^2_\beta$ would go to $\infty$ and the $\beta_{tp}$ would be equal to estimates of $t$ independent regressions. If there are, conversely, just very few observations at each time point, $\sigma^2_\beta$ will turn out to be small and observations from neighboring time points weigh in strongly in the estimation of $\beta_{tp}$.
+Unlike other approaches we are aware of, we include a fluctuation equation, only possible because we usually have (far) more than one observation at each time point. (In state-space terminology this would be the observation equation. The name `fluctuation equation` is our invention.) The implication is this: If we had at each time point an infinite number of observations, $\sigma^2_\beta$ would go to $\infty$ and the $\beta_{tp}$ would be equal to estimates of $t$ independent regressions. If there are, conversely, just very few observations at each time point, $\sigma^2_\beta$ will turn out to be small and observations from neighboring time points weigh in strongly in the estimation of $\beta_{tp}$.
 
-Our approach is purely Bayesian. We estimate parameters using the probabilistic modeling language Stan \citep{stan_development_team_rstan_2021}, see supplementary files.
+Our approach is purely Bayesian. We estimate parameters using the probabilistic modeling language Stan \citep{stan_development_team_rstan_2021}, see supplementary files online.
 
 \section{Simulation Study for Continuous Outcomes}
 
-To test the estimation procedure, we run a simulation study. We start with a time series $ts_t$ containing 100 time points, shown in red in Figure \ref{fig:fig1} (the Nile data from \citep{durbin_time_2012}). Our simulated data has five observations at each time point. The covariates $x_{i1} \sim N(0,1)$ and $x_{i2} \sim N(0, 20)$ are drawn from two independent normal distributions. The observed $y$-values (the black dots in Figure \ref{fig:fig1}) are then generated using the formula
+To test the estimation procedure, we run a simulation study. We start with a time series $ts_t$ containing 100 time points, shown in red in Figure \ref{fig:fig1} (the Nile data from \citep{durbin_time_2012}). Our simulated data have five observations at each time point. The covariates $x_{i1} \sim N(0,1)$ and $x_{i2} \sim N(0, 20)$ are drawn from two independent normal distributions. The observed $y$-values (the black dots in Figure \ref{fig:fig1}) are then generated using the formula
 
 \begin{align}
 y_{i(t)} = ts_t + 30 \cdot x_{i1} + 0 \cdot x_{i2} + N(0, 5)    
@@ -135,7 +135,7 @@ y_{i(t)} = ts_t + 30 \cdot x_{i1} + 0 \cdot x_{i2} + N(0, 5)
 
 Green dots depict the outcome values before adding the noise $N(0, 5)$. They are only shown for illustration (noise is very small in our setup!) and are not used for estimation.
 
-The goal of the simulation is to see whether we can recover the original time series and the parameters $\beta_{1t} = 30$ and $\beta_{2t} = 0$ using observed data $x_{i(t)1}$, $x_{i(t)2}$ and $y_{i(t)}$ only. Only observations from $t = 1, ..., 70$ are used for model training, the final 30 time points are used for evaluation. Our evaluation showcases for certain parameters and predictions of interest the posterior means from 8000 MCMC draws, along with their .95-credibility intervals.
+The goal of the simulation is to see whether we can recover the original time series and the parameters $\beta_{1t} = 30$ and $\beta_{2t} = 0$ using observed data $x_{i(t)1}$, $x_{i(t)2}$ and $y_{i(t)}$ only. Only observations from $t = 1, ..., 70$ are used for model training, the final 30 time points are used for evaluation. The delay (time between availability of features and outcomes) in this simulation is zero, otherwise there would be a gap between training and test data. Our evaluation showcases for certain parameters and predictions of interest the posterior means from 8000 MCMC draws, along with their .95-credibility intervals.
 
 \begin{figure}
 	\centering
@@ -180,7 +180,7 @@ y^{(bin)}_{i(t)} | x_{i(t)p} \sim Bin(1, \textrm{logit}^{-1}(\sum_p x_{i(t)p} \b
 \end{eqnarray}
 without making other changes.
 
-However, meaningful results as shown for continuous outcomes above cannot be replicated with binary outcomes. In three simulations we keep the setup for continuous outcomes, except that we draw binary outcomes. In particular, we 
+However, meaningful results as shown for continuous outcomes above cannot be replicated with binary outcomes. In three simulations we keep the setup for continuous outcomes, except that we draw binary outcomes now. In particular, we 
 
 \begin{enumerate}
     \item draw the outcome $y^{(bin)}_{i(t)}$ from a Bernoulli distribution with probability $p = \textrm{logit}^{-1}(ts_t - 919.35 + 30 \cdot x_{i1} + 0 \cdot x_{i2})$
@@ -188,7 +188,7 @@ However, meaningful results as shown for continuous outcomes above cannot be rep
     \item set $y^{(bin)}_{i(t)}$ to 1 if $y_{i(t)} > 900$
 \end{enumerate}
 
-For the third simulation, the MCMC-chains do not mix and we are unable to determine the posterior distribution. For the first two simulations, we obtain similar warnings, but preliminary graphical checks indicate that sufficient mixing occurred. Yet, the estimates do not resemble or correlate with the true values from the simulation setup in any meaningful way.
+For the third simulation, the MCMC-chains do not mix, implying non-convergence, and we are unable to determine the posterior distribution. For the first two simulations, we also obtain warnings that chains do not mix, but preliminary graphical checks indicate that sufficient mixing occurred. Yet, the estimates do not resemble or correlate with the true values from the simulation setup in any meaningful way.
 
 The model was also tested with the DonorsChoose dataset, but the MCMC chains did not mix.
 
@@ -200,7 +200,7 @@ However, our main goal was to apply this approach with binary outcomes and logis
 
 Our observation equation, least-squares regression, assumes linearity of parameters, making it rather restrictive. Interactions would need to be hand-coded, and allowing for arbitrary functional forms is rather challenging. Conversely, statistical learning algorithms allow the estimation of more flexible functional forms and automated feature selection. This promises better performance and makes the feature engineering processes more efficient, so that statistical learning is the preferred option for many. Statistical learning that takes time into account would, for example, be possible using Long Short-Term Memory (LSTM) Artificial Neural Networks \citep{hochreiter_long_1997}. A comparison with our approach would be valuable.
 
-Maybe the most important feature of our approach is about being explicit on prognostic uncertainty. As this is not possible with statistical learning, we call for more research in the direction suggested here.
+Maybe the most important feature of our approach is being explicit on prognostic uncertainty. As this is not possible with statistical learning, we call for more research in the direction suggested here.
 
 
 \bibliographystyle{unsrtnat}
