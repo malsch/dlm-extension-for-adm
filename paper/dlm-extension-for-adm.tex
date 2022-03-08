@@ -26,11 +26,11 @@
 %\date{September 9, 1985}	% Here you can change the date presented in the paper title
 %\date{} 					% Or removing it
 
-\author{ \href{https://orcid.org/0000-0003-4058-1543}{\includegraphics[scale=0.06]{orcid.pdf}\hspace{1mm}Malte~Schierholz}\thanks{This work has been created during a research stay at the Machine Learning for Public Policy lab at Carnegie Mellon University} \\
+\author{ \href{https://orcid.org/0000-0003-4058-1543}{\includegraphics[scale=0.06]{orcid.pdf}\hspace{1mm}Malte~Schierholz}\thanks{This work has been created during a research stay at the Machine Learning for Public Policy lab at Carnegie Mellon University.} \\
 	Department of Statistics\\
 	Ludwig-Maximilians-Universität München\\
 	80539 Munich \\
-	\texttt{hippo@cs.cranberry-lemon.edu CHANGE THIS} \\
+	\texttt{malte.schierholz@stat.uni-muenchen.de} \\
 	%% examples of more authors
 	%% \AND
 	%% Coauthor \\
@@ -71,7 +71,7 @@ pdfkeywords={Distribution shift, Forecasting individual outcomes, Regression, St
 \maketitle
 
 \begin{abstract}
-	A common approach in forecasting problems is to estimate a least-squares regression (or other statistical learning models) from past data, which is then applied to predict future outcomes. An underlying assumption is that the same correlations that were observed in the past still hold for the future. We propose a model for situations when this assumption is not met: adopting methods from the state space literature, we model how regression parameters change over time. Our approach can shed a light on the large uncertainties associated with forecasting the future, and how much of this is due to changing dynamics of the past. Our simulation study shows that accurate estimates are obtained when the outcome is continuous, but the procedure fails for binary outcomes.
+	A common approach in forecasting problems is to estimate a least-squares regression (or other statistical learning models) from past data, which is then applied to predict future outcomes. An underlying assumption is that the same correlations that were observed in the past still hold for the future. We propose a model for situations when this assumption is not met: adopting methods from the state space literature, we model how regression coefficients change over time. Our approach can shed light on the large uncertainties associated with forecasting the future, and how much of this is due to changing dynamics of the past. Our simulation study shows that accurate estimates are obtained when the outcome is continuous, but the procedure fails for binary outcomes.
 \end{abstract}
 
 
@@ -194,9 +194,9 @@ The model was also tested with the DonorsChoose dataset, but the MCMC chains did
 
 \section{Discussion}\label{sec:discussion}
 
-We propose a new approach for time-related data analysis, adopting concepts from the state space literature. This approach allows explicit modeling how parameters in least-square regressions change over time. Our simulation provides promising results for continuous outcomes. 
+We propose a new approach for time-related data analysis, adopting concepts from the state space literature. This approach allows explicit modeling of how parameters in least-square regressions change over time. Our simulation provides promising results for continuous outcomes. 
 
-However, our main goal was to apply this approach with binary outcomes and logistic regression, and this was not successful. To move forward, we recommend further simulation studies. For binary outcomes, we wonder under which circumstances one could still make progress, or if this is impossible for theoretical reasons. For continuous outcomes, we argued that our approach should be most fruitful in the presence of long-term trends or sudden shocks, but this reasoning should be confirmed in simulation studies.
+However, our main goal was to apply this approach with binary outcomes and logistic regression, and this was not successful. To move forward, we recommend further simulation studies. For binary outcomes, we wonder under which circumstances one could still make progress, or if theoretical reasons make this impossible. For continuous outcomes, we argued that our approach should be most fruitful in the presence of long-term trends or sudden shocks, but this reasoning should be confirmed in simulation studies. Other simulations should explore issues such as the following: What is the minimal number of time points needed for our approach and what else can be learned from such simulations of reduced complexity? When simulating data using the proposed model (and not using the 100 Nile data points we have used here), can additional, higher-level model parameters be estimated consistently? Can the parameters still be estimated if the true parameters fluctuate over time?
 
 Our observation equation, least-squares regression, assumes linearity of parameters, making it rather restrictive. Interactions would need to be hand-coded, and allowing for arbitrary functional forms is rather challenging. Conversely, statistical learning algorithms allow the estimation of more flexible functional forms and automated feature selection. This promises better performance and makes the feature engineering processes more efficient, so that statistical learning is the preferred option for many. Statistical learning that takes time into account would, for example, be possible using Long Short-Term Memory (LSTM) Artificial Neural Networks \citep{hochreiter_long_1997}. A comparison with our approach would be valuable.
 
