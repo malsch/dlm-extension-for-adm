@@ -1,4 +1,6 @@
 #################
+
+library("colorspace"); q4 <- palette.colors(palette = "Okabe-Ito")
 library("rstan")
 
 # Create Data
@@ -31,14 +33,14 @@ dt$y_binary2 <- as.integer(dt$y > dt$ts * dt$x0 + 30 * dt$x1)
 dt$y_binary3 <- as.integer(dt$y > 900)
 
 pdf("visualize_simulated_data.pdf", width = 12)
-plot(x = seq(1, 100, length = 500), dt$y, xlab = "time", ylab = "y")
-lines(x = seq(1, 100, length = 100), y_ts_smooth, col = 2, lty = "solid", lwd = 2)
-points(x = seq(1, 100, length = 500), dt$ts + 30 * dt$x1, col = 3)
-points(x = seq(1, 100, length = 100), y_ts[1,], col = 2, lwd = 2)
+plot(x = seq(1, 100, length = 500), dt$y, xlab = "time", ylab = "y", col = q4[1])
+lines(x = seq(1, 100, length = 100), y_ts_smooth, col = q4[2], lty = "solid", lwd = 2)
+points(x = seq(1, 100, length = 500), dt$ts + 30 * dt$x1, col = q4[3])
+points(x = seq(1, 100, length = 100), y_ts[1,], col = q4[2], lwd = 2)
 # points(x = seq(1, 100, length = 500), dt$y)
 abline(v = 350 / 5)
 text(x = c(200, 450) / 5, y = 1400, labels = c("Training", "Test"))
-legend("bottomleft", lty = 1, legend = c("time series (with moving average)", "signal = time series + 30*x1 + 0*x2", "observed values = signal + N(0, 5)"), col = c(2, 3, 1))
+legend("bottomleft", lty = 1, legend = c("time series (with moving average)", "signal = time series + 30*x1 + 0*x2", "observed values = signal + N(0, 5)"), col = q4[c(2, 3, 1)])
 dev.off()
 
 dt_train <- dt[1:(5*70),]
@@ -121,33 +123,33 @@ for (i in 1:1) { # dim(la$alpha)[3]
     points(1:dim(la$alpha)[2], y = alpha.lb[,i], lty = 'dotted', type = 'l');
     points(1:dim(la$alpha)[2], y = alpha.ub[,i], lty = 'dotted', type = 'l');
 }
-points(y_ts[1, ], type = 'p', col = 2)
-points(y_ts_smooth, type = 'l', col = 2)
-legend("bottomleft", lty = 1, legend = c("time series and its moving average (as above)", "smoothed times series (with 95%-credibility interval)"), col = c(2, 1))
+points(y_ts[1, ], type = 'p', col = q4[2])
+points(y_ts_smooth, type = 'l', col = q4[2])
+legend("bottomleft", lty = 1, legend = c("time series and its moving average (as above)", "smoothed times series (with 95%-credibility interval)"), col = q4[c(2, 1)])
 abline(v = 70)
 text(x = c(35, 85), y = 400, labels = c("Training", "Test"))
 dev.off()
 
 pdf("compare_predictions_with_simulated_data.pdf")
-plot(x = seq(71, 100, length = 150), y = futurePredictedY_mean, ylim = c(-50, 1500), col = 4, xlab = "time", ylab = "y", main = "Predictions during test period")
-segments(x0 = seq(71, 100, length = 150), x1 = seq(71, 100, length = 150), col = 4, y0 = futurePredictedY.lb, y1 = futurePredictedY.ub)
+plot(x = seq(71, 100, length = 150), y = futurePredictedY_mean, ylim = c(-50, 1500), col = q4[4], xlab = "time", ylab = "y", main = "Predictions during test period")
+segments(x0 = seq(71, 100, length = 150), x1 = seq(71, 100, length = 150), col = q4[4], y0 = futurePredictedY.lb, y1 = futurePredictedY.ub)
 points(seq(71, 100, length = 150), dt_test$y)
 dev.off()
 
 pdf("coefficients_over_time.pdf")
 par(mfrow = c(2,1))
 plot(1:dim(la$alpha)[2], alpha[,2], ylim = c(min(alpha.lb[,2]), max(alpha.ub[,2])), type = 'l', ylab = expression(b[1]), xlab = "time"); 
-legend("topleft", lty = 1, legend = c("true coefficient", "estimate (with 95%-credibility interval)"), col = c(2, 1))
+legend("topleft", lty = 1, legend = c("true coefficient", "estimate (with 95%-credibility interval)"), col = q4[c(2, 1)])
 points(1:dim(la$alpha)[2], y = alpha.lb[,2], lty = 'dotted', type = 'l');
 points(1:dim(la$alpha)[2], y = alpha.ub[,2], lty = 'dotted', type = 'l');
-abline(h = 30, lty = "dotdash", col = 2)
+abline(h = 30, lty = "dotdash", col = q4[2])
 abline(v = 70)
 text(x = c(35, 85), y = 27.5, labels = c("Training", "Test"))
 
 plot(1:dim(la$alpha)[2], alpha[,3], ylim = c(min(alpha.lb[,3]), max(alpha.ub[,3])), type = 'l', ylab = expression(b[2]), xlab = "time"); 
 points(1:dim(la$alpha)[2], y = alpha.lb[,3], lty = 'dotted', type = 'l');
 points(1:dim(la$alpha)[2], y = alpha.ub[,3], lty = 'dotted', type = 'l');
-abline(h = 0, lty = "dotdash", col = 2)
+abline(h = 0, lty = "dotdash", col = q4[2])
 abline(v = 70)
 text(x = c(35, 85), y = -0.15, labels = c("Training", "Test"))
 dev.off()
